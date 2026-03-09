@@ -145,6 +145,18 @@
       font-weight: 700;
     }
 
+    .link-btn {
+      display: inline-block;
+      margin-top: 12px;
+      text-decoration: none;
+      background: #0f766e;
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
     @media (max-width: 420px) {
       .row {
         grid-template-columns: 1fr;
@@ -197,6 +209,7 @@
     </section>
 
     <p class="note-pill">Whole Food Blends to use for night feed: salmon 🐟 or turkey 🦃.</p>
+    <a id="setupLink" class="link-btn" href="infinity-pump-setup.html">Open Infinity Pump Setup Guide</a>
   </main>
 
   <script>
@@ -213,7 +226,8 @@
       formula: document.getElementById('formula'),
       syringes: document.getElementById('syringes'),
       doseAmount: document.getElementById('doseAmount'),
-      doseFormula: document.getElementById('doseFormula')
+      doseFormula: document.getElementById('doseFormula'),
+      setupLink: document.getElementById('setupLink')
     };
 
     function num(input) {
@@ -249,6 +263,14 @@
       const dose = Math.max(0, bag - PRIME_EXTRA);
       ids.doseAmount.textContent = `${dose} mL`;
       ids.doseFormula.textContent = `Bag fill amount − ${PRIME_EXTRA} mL prime`;
+      ids.setupLink.href = `infinity-pump-setup.html?dose=${encodeURIComponent(dose)}`;
+
+      try {
+        localStorage.setItem('maeveNightBagFoodMl', String(bag));
+        localStorage.setItem('maeveNightDoseMl', String(dose));
+      } catch (err) {
+        // Ignore storage errors (private mode / blocked storage).
+      }
     }
 
     [

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infinity Pump Setup Guide</title>
+  <style>
+    :root {
+      --bg: #eef6f9;
+      --card: #ffffff;
+      --ink: #1c2740;
+      --muted: #4f607e;
+      --accent: #0f766e;
+      --border: #d0dceb;
+      --hot: #e5484d;
+      --hot-glow: rgba(229, 72, 77, 0.34);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 14px;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #dff3f0, var(--bg) 45%);
+      color: var(--ink);
+      min-height: 100vh;
+      display: grid;
+      place-items: start center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 700px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(16, 28, 56, 0.09);
+      padding: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 8px 0 14px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: #f5fafb;
+      border: 1px solid #c7e7e3;
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .stat .label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #4f607e;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .stat .value {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #0b5c56;
+      line-height: 1.1;
+    }
+
+    .sync-note {
+      margin: 0 0 12px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .pump-card {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #d8f1f4;
+      border: 1px solid #aed7df;
+    }
+
+    .pump-card img {
+      width: 100%;
+      display: block;
+      height: auto;
+    }
+
+    .screen-overlay {
+      position: absolute;
+      left: 4.2%;
+      top: 58.7%;
+      width: 50.8%;
+      height: 34.3%;
+      border-radius: 10px;
+      border: 1px solid rgba(180, 214, 234, 0.8);
+      background: rgba(9, 23, 39, 0.86);
+      color: #dcfff4;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 10px;
+      pointer-events: none;
+    }
+
+    .screen-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #9fd8ca;
+    }
+
+    .screen-main {
+      font-family: "Courier New", "SFMono-Regular", monospace;
+      font-size: clamp(1rem, 5vw, 2rem);
+      font-weight: 700;
+      line-height: 1.05;
+      text-align: center;
+      color: #d6ffe7;
+      text-shadow: 0 0 14px rgba(47, 255, 179, 0.22);
+    }
+
+    .screen-sub {
+      font-size: 0.76rem;
+      color: #9fd8ca;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .hotspot {
+      position: absolute;
+      width: 8.6%;
+      aspect-ratio: 1 / 1;
+      border-radius: 999px;
+      border: 2px dashed transparent;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: all 0.2s ease-out;
+    }
+
+    .hotspot.active {
+      border-color: var(--hot);
+      box-shadow: 0 0 0 7px var(--hot-glow);
+      background: rgba(255, 255, 255, 0.14);
+      animation: pulse 1.1s ease-in-out infinite;
+    }
+
+    .hotspot.onoff { left: 65.8%; top: 58.8%; }
+    .hotspot.feedint { left: 77.1%; top: 58.8%; }
+    .hotspot.clear { left: 88.3%; top: 58.8%; }
+    .hotspot.prime { left: 65.8%; top: 70.2%; }
+    .hotspot.voltotal { left: 77.1%; top: 70.2%; }
+    .hotspot.plus { left: 88.3%; top: 70.2%; }
+    .hotspot.runpause { left: 65.8%; top: 82.0%; }
+    .hotspot.ratedose { left: 77.1%; top: 82.0%; }
+    .hotspot.minus { left: 88.3%; top: 82.0%; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 5px var(--hot-glow); }
+      50% { box-shadow: 0 0 0 12px rgba(229, 72, 77, 0.14); }
+      100% { box-shadow: 0 0 0 5px var(--hot-glow); }
+    }
+
+    .step-card {
+      margin-top: 12px;
+      border-radius: 12px;
+      border: 1px solid #d6e3f0;
+      background: #f8fbff;
+      padding: 10px 12px;
+    }
+
+    .step-count {
+      margin: 0;
+      color: #557294;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .step-title {
+      margin: 5px 0 4px;
+      font-size: 1.02rem;
+      line-height: 1.2;
+    }
+
+    .step-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.35;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      flex: 1;
+      cursor: pointer;
+    }
+
+    #prevBtn {
+      background: #dce7f5;
+      color: #233a59;
+    }
+
+    #nextBtn {
+      background: #0f766e;
+      color: #ffffff;
+    }
+
+    .link-row {
+      margin-top: 12px;
+    }
+
+    .link-row a {
+      color: #0f766e;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 560px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Infinity Pump Night Setup</h1>
+    <p class="subtitle">
+      Visual guide based on <strong>Maeve Care Plan 2.24.26</strong> and the
+      <strong>Infinity Quick Reference Card</strong>. Step through to highlight the right button each time.
+    </p>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="label">Saved Bag Food</div>
+        <div id="savedBag" class="value">72 mL</div>
+      </div>
+      <div class="stat">
+        <div class="label">Set Dose</div>
+        <div id="setDose" class="value">77 mL</div>
+      </div>
+      <div class="stat">
+        <div class="label">Set Rate</div>
+        <div class="value">50 mL/hr</div>
+      </div>
+    </section>
+    <p id="syncNote" class="sync-note"></p>
+
+    <section class="pump-card">
+      <img src="InfinityPump.png" alt="Infinity pump with highlighted controls for setup steps" />
+
+      <div class="screen-overlay" aria-live="polite">
+        <div class="screen-top">
+          <span id="screenMode">off</span>
+          <span id="screenState">standby</span>
+        </div>
+        <div id="screenMain" class="screen-main">OFF</div>
+        <div id="screenSub" class="screen-sub">Hold ON/OFF to start</div>
+      </div>
+
+      <div data-key="onoff" class="hotspot onoff"></div>
+      <div data-key="feedint" class="hotspot feedint"></div>
+      <div data-key="clear" class="hotspot clear"></div>
+      <div data-key="prime" class="hotspot prime"></div>
+      <div data-key="voltotal" class="hotspot voltotal"></div>
+      <div data-key="plus" class="hotspot plus"></div>
+      <div data-key="runpause" class="hotspot runpause"></div>
+      <div data-key="ratedose" class="hotspot ratedose"></div>
+      <div data-key="minus" class="hotspot minus"></div>
+    </section>
+
+    <section class="step-card">
+      <p id="stepCount" class="step-count">Step 1 of 9</p>
+      <h2 id="stepTitle" class="step-title"></h2>
+      <p id="stepText" class="step-text"></p>
+      <div class="controls">
+        <button id="prevBtn" type="button">Previous</button>
+        <button id="nextBtn" type="button">Next</button>
+      </div>
+    </section>
+
+    <div class="link-row">
+      <a href="index.html">Back to Feeding Calculator</a>
+    </div>
+  </main>
+
+  <script>
+    const TARGET_RATE = 50;
+
+    const params = new URLSearchParams(window.location.search);
+    const queryDose = Number(params.get('dose'));
+    const queryBag = Number(params.get('bag'));
+    const storedDose = Number(localStorage.getItem('maeveNightDoseMl'));
+    const storedBag = Number(localStorage.getItem('maeveNightBagFoodMl'));
+    const hasQueryDose = Number.isFinite(queryDose) && queryDose >= 0;
+    const hasQueryBag = Number.isFinite(queryBag) && queryBag >= 0;
+    const hasStoredDose = Number.isFinite(storedDose) && storedDose >= 0;
+    const hasStoredBag = Number.isFinite(storedBag) && storedBag >= 0;
+    const bagFood = hasQueryBag ? queryBag : (hasStoredBag ? storedBag : 72);
+    const fallbackDoseFromBag = Math.max(0, bagFood - 40) + 45;
+    const targetDose = hasQueryDose
+      ? queryDose
+      : (hasStoredDose ? storedDose : fallbackDoseFromBag);
+
+    document.getElementById('savedBag').textContent = `${bagFood} mL`;
+    document.getElementById('setDose').textContent = `${targetDose} mL`;
+
+    const syncNote = document.getElementById('syncNote');
+    if (hasQueryDose || hasStoredDose) {
+      syncNote.textContent = `Dose synced from feeding calculator: ${targetDose} mL.`;
+    } else if (hasQueryBag || hasStoredBag) {
+      syncNote.textContent = `Dose fallback from bag amount: (${bagFood} - 40) + 45 = ${targetDose} mL.`;
+    } else {
+      syncNote.textContent = 'No saved dose found, using fallback default. Open the calculator first to sync dose.';
+    }
+
+    const steps = [
+      {
+        title: 'Hang and load the feed set',
+        text: 'Hang the bag at or above pump door level, load cassette, and close the pump door. Rate should already be 50 mL/hr.',
+        highlights: [],
+        screen: { mode: 'OFF', state: 'STANDBY', main: 'OFF', sub: 'Load cassette and close door' }
+      },
+      {
+        title: 'Power on the pump',
+        text: 'Press and hold ON/OFF until the pump beeps.',
+        highlights: ['onoff'],
+        screen: { mode: 'RATE', state: 'READY', main: '150 mL/hr', sub: 'Pump turns on showing last rate' }
+      },
+      {
+        title: 'Prime the tubing',
+        text: 'Press and hold PRIME until formula reaches connector. Prime at least 5 mL into the measuring cup.',
+        highlights: ['prime'],
+        screen: { mode: 'RATE', state: 'PRIMING', main: 'PRIME', sub: 'Hold PRIME while fluid advances' }
+      },
+      {
+        title: 'Set RATE to 50 mL/hr',
+        text: 'Confirm rate is already 50 mL/hr. If needed, press RATE/DOSE until RATE shows, then adjust with + or - until 50.',
+        highlights: ['ratedose', 'plus', 'minus'],
+        screen: { mode: 'RATE', state: 'PROGRAM', main: `${TARGET_RATE} mL/hr`, sub: 'Rate confirmed at 50' }
+      },
+      {
+        title: `Set DOSE to ${targetDose} mL`,
+        text: 'Press RATE/DOSE until DOSE shows, then use + or - to set tonight dose.',
+        highlights: ['ratedose', 'plus', 'minus'],
+        screen: { mode: 'DOSE', state: 'PROGRAM', main: `${targetDose} mL`, sub: 'Dose based on calculator amount' }
+      },
+      {
+        title: 'Connect to extension and unclamp',
+        text: 'Pass tubing through crib slats, twist onto extension, and make sure clamp is open.',
+        highlights: [],
+        screen: { mode: 'DOSE', state: 'READY', main: `${targetDose} mL`, sub: 'Line connected and unclamped' }
+      },
+      {
+        title: 'Start the night feed (9:30 PM)',
+        text: 'Press RUN/PAUSE to begin feeding. If it says "Press to run," press RUN/PAUSE again.',
+        highlights: ['runpause'],
+        screen: { mode: 'RATE', state: 'RUNNING', main: `${TARGET_RATE} mL/hr`, sub: `Dose running: ${targetDose} mL` }
+      },
+      {
+        title: 'Troubleshooting quick check',
+        text: '"No flow out" usually means a kink to Maeve. "No flow in" usually means flow from bag side; rotate bag forward.',
+        highlights: ['runpause'],
+        screen: { mode: 'RATE', state: 'RUNNING', main: `${TARGET_RATE} mL/hr`, sub: 'Monitor alarms on screen text' }
+      }
+    ];
+
+    const screenMode = document.getElementById('screenMode');
+    const screenState = document.getElementById('screenState');
+    const screenMain = document.getElementById('screenMain');
+    const screenSub = document.getElementById('screenSub');
+    const stepCount = document.getElementById('stepCount');
+    const stepTitle = document.getElementById('stepTitle');
+    const stepText = document.getElementById('stepText');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const hotspots = Array.from(document.querySelectorAll('.hotspot'));
+
+    let stepIndex = 0;
+
+    function renderStep() {
+      const step = steps[stepIndex];
+      stepCount.textContent = `Step ${stepIndex + 1} of ${steps.length}`;
+      stepTitle.textContent = step.title;
+      stepText.textContent = step.text;
+
+      hotspots.forEach((el) => {
+        const isActive = step.highlights.includes(el.dataset.key);
+        el.classList.toggle('active', isActive);
+      });
+
+      screenMode.textContent = step.screen.mode;
+      screenState.textContent = step.screen.state;
+      screenMain.textContent = step.screen.main;
+      screenSub.textContent = step.screen.sub;
+
+      prevBtn.disabled = stepIndex === 0;
+      nextBtn.textContent = stepIndex === steps.length - 1 ? 'Start Over' : 'Next';
+    }
+
+    prevBtn.addEventListener('click', () => {
+      stepIndex = Math.max(0, stepIndex - 1);
+      renderStep();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (stepIndex === steps.length - 1) {
+        stepIndex = 0;
+      } else {
+        stepIndex += 1;
+      }
+      renderStep();
+    });
+
+    renderStep();
+  </script>
+</body>
+</html>
