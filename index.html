@@ -190,6 +190,12 @@
       <div id="syringes" class="pill"></div>
     </section>
 
+    <section class="result" aria-live="polite">
+      <h2>Pump Dose</h2>
+      <p id="doseAmount" class="value"></p>
+      <div class="formula">Bag fill amount − 40 mL prime</div>
+    </section>
+
     <p class="note-pill">Whole Food Blends to use for night feed: salmon 🐟 or turkey 🦃.</p>
   </main>
 
@@ -205,7 +211,8 @@
       isSchoolDay: document.getElementById('isSchoolDay'),
       bagAmount: document.getElementById('bagAmount'),
       formula: document.getElementById('formula'),
-      syringes: document.getElementById('syringes')
+      syringes: document.getElementById('syringes'),
+      doseAmount: document.getElementById('doseAmount')
     };
 
     function num(input) {
@@ -237,6 +244,9 @@
         ids.syringes.textContent =
           `Measure: ${fullSyringes} full 60 mL syringe${fullSyringes === 1 ? '' : 's'} + ${remainder} mL`;
       }
+
+      const dose = Math.max(0, bag - PRIME_EXTRA);
+      ids.doseAmount.textContent = `${dose} mL`;
     }
 
     [
