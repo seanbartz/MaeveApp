@@ -285,16 +285,7 @@
 <body>
   <main class="app">
     <h1>Infinity Pump Night Setup</h1>
-    <p class="subtitle">
-      Visual guide based on <strong>Maeve Care Plan 2.24.26</strong> and the
-      <strong>Infinity Quick Reference Card</strong>. Step through to highlight the right button each time.
-    </p>
-
     <section class="stats">
-      <div class="stat">
-        <div class="label">Saved Bag Food</div>
-        <div id="savedBag" class="value">72 mL</div>
-      </div>
       <div class="stat">
         <div class="label">Set Dose</div>
         <div id="setDose" class="value">77 mL</div>
@@ -362,7 +353,6 @@
       ? queryDose
       : (hasStoredDose ? storedDose : fallbackDoseFromBag);
 
-    document.getElementById('savedBag').textContent = `${bagFood} mL`;
     document.getElementById('setDose').textContent = `${targetDose} mL`;
 
     const syncNote = document.getElementById('syncNote');
