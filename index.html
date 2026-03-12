@@ -279,6 +279,14 @@
       }
     }
 
+    try {
+      if (localStorage.getItem('maeveExtraWater') === '1') {
+        ids.extraWater.checked = true;
+      }
+    } catch (err) {
+      // Ignore storage errors (private mode / blocked storage).
+    }
+
     [
       ids.dayFeedAmount,
       ids.extraCutOut,
