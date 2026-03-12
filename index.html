@@ -189,6 +189,11 @@
       School day?
     </label>
 
+    <label class="toggle">
+      <input id="extraWater" type="checkbox" />
+      45 mL extra water?
+    </label>
+
     <section class="result" aria-live="polite">
       <h2>Pump Bag Fill Amount</h2>
       <p id="bagAmount" class="value">72 mL</p>
@@ -211,11 +216,13 @@
     const DAY_FEEDS = 4;
     const PRIME_EXTRA = 40;
     const SCHOOL_DAY_CUT = 60;
+    const EXTRA_WATER = 45;
 
     const ids = {
       dayFeedAmount: document.getElementById('dayFeedAmount'),
       extraCutOut: document.getElementById('extraCutOut'),
       isSchoolDay: document.getElementById('isSchoolDay'),
+      extraWater: document.getElementById('extraWater'),
       bagAmount: document.getElementById('bagAmount'),
       formula: document.getElementById('formula'),
       syringes: document.getElementById('syringes'),
@@ -233,6 +240,7 @@
       const dayFeedAmount = num(ids.dayFeedAmount);
       const extraCutOut = num(ids.extraCutOut);
       const isSchoolDay = ids.isSchoolDay.checked;
+      const hasExtraWater = ids.extraWater.checked;
 
       const daytimeIntake = DAY_FEEDS * dayFeedAmount;
       const schoolMakeup = isSchoolDay ? SCHOOL_DAY_CUT : 0;
@@ -254,14 +262,18 @@
           `Measure: ${fullSyringes} full 60 mL syringe${fullSyringes === 1 ? '' : 's'} + ${remainder} mL`;
       }
 
-      const dose = Math.max(0, bag - PRIME_EXTRA);
+      const waterBonus = hasExtraWater ? EXTRA_WATER : 0;
+      const dose = Math.max(0, bag - PRIME_EXTRA + waterBonus);
       ids.doseAmount.textContent = `${dose} mL`;
-      ids.doseFormula.textContent = `Bag fill amount − ${PRIME_EXTRA} mL prime`;
+      ids.doseFormula.textContent = hasExtraWater
+        ? `Bag fill amount − ${PRIME_EXTRA} mL prime + ${EXTRA_WATER} mL extra water`
+        : `Bag fill amount − ${PRIME_EXTRA} mL prime`;
       ids.setupLink.href = `infinity-pump-setup.html?dose=${encodeURIComponent(dose)}`;
 
       try {
         localStorage.setItem('maeveNightBagFoodMl', String(bag));
         localStorage.setItem('maeveNightDoseMl', String(dose));
+        localStorage.setItem('maeveExtraWater', hasExtraWater ? '1' : '0');
       } catch (err) {
         // Ignore storage errors (private mode / blocked storage).
       }
@@ -270,7 +282,8 @@
     [
       ids.dayFeedAmount,
       ids.extraCutOut,
-      ids.isSchoolDay
+      ids.isSchoolDay,
+      ids.extraWater
     ].forEach((el) => {
       if (!el) return;
       el.addEventListener('input', calculate);
